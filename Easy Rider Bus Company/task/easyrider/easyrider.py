@@ -54,7 +54,15 @@ for obj in data:
             # print(obj[field])
             format_error_count[field] += 1
 
-print(f"Format validation: {sum(format_error_count.values())} errors")
-for field in formatted_fields:
-    print(f"{field}: {format_error_count[field]}")
+# print(f"Format validation: {sum(format_error_count.values())} errors")
+# for field in formatted_fields:
+#     print(f"{field}: {format_error_count[field]}")
 
+bus_lines = {}
+print("Line names and number of stops:")
+for obj in data:
+    if obj["bus_id"] not in bus_lines:
+        bus_lines[obj["bus_id"]] = 0
+    bus_lines[obj["bus_id"]] += 1
+for bus_id in bus_lines:
+    print(f"bus_id: {bus_id}, stops: {bus_lines[bus_id]}")
