@@ -50,12 +50,12 @@ class Stop:
 class BusLine:
     def __init__(self, bus_id):
         self.bus_id = bus_id
-        self.stops = []
+        self.stops = {}
         self.start = None
         self.finish = None
 
     def add_stop(self, stop):
-        self.stops.append(stop)
+        self.stops[stop.stop_id] = stop
         if stop.stop_type == 'S':
             self.start = stop
         if stop.stop_type == 'F':
@@ -63,7 +63,7 @@ class BusLine:
 
     def get_stop_names(self):
         stop_names = set()
-        for stop in self.stops:
+        for stop in self.stops.values():
             stop_names.add(stop.stop_name)
         return stop_names
 
@@ -92,6 +92,23 @@ def check_lines_ends(lines):
             return False
     return True
 
+def check_time(lines):
+    print('Arrival time test')
+    ok = True
+    for bus_id in lines:
+        stops = lines[bus_id].stops
+        cur_stop = lines[bus_id].start.stop_id
+        while cur_stop != lines[bus_id].finish.stop_id:
+            next_stop = stops[cur_stop].next_stop
+            if stops[next_stop].a_time <= stops[cur_stop].a_time:
+                ok = False
+                print(f"bus_id line {bus_id}: wrong time on station {stops[next_stop].stop_name}")
+                break
+            cur_stop = next_stop
+    if ok:
+        print("OK")
+
+
 def find_start_stops(lines):
     start_stops = set()
     for bus_id in lines:
@@ -113,13 +130,14 @@ def find_transfer_stops(lines):
 data_str = input()
 data = json.loads(data_str)
 lines = describe_lines(data)
-if check_lines_ends(lines):
-    start_stops = sorted(list(find_start_stops(lines)))
-    transfer_stops = sorted(list(find_transfer_stops(lines)))
-    finish_stops = sorted(list(find_finish_stops(lines)))
-    print(f"Start stops: {len(start_stops)} {start_stops}")
-    print(f"Transfer stops: {len(transfer_stops)} {transfer_stops}")
-    print(f"Finish stops: {len(finish_stops)} {finish_stops}")
+check_time(lines)
+# if check_lines_ends(lines):
+#     start_stops = sorted(list(find_start_stops(lines)))
+#     transfer_stops = sorted(list(find_transfer_stops(lines)))
+#     finish_stops = sorted(list(find_finish_stops(lines)))
+#     print(f"Start stops: {len(start_stops)} {start_stops}")
+#     print(f"Transfer stops: {len(transfer_stops)} {transfer_stops}")
+#     print(f"Finish stops: {len(finish_stops)} {finish_stops}")
 
 
 
